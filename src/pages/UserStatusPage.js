@@ -1,5 +1,6 @@
 import useStore from '../useStore.js';
 import Button from '../components/Button.js';
+import { useEffect } from 'react';
 
 export default function UserStatusPage({
   onLogin,
@@ -8,10 +9,16 @@ export default function UserStatusPage({
   token,
 }) {
   const loans = useStore(state => state.loans);
-  const setAvailableLoans = useStore(state => state.setAvailableLoans);
-
+  const loansError = useStore(state => state.loansError);
+  const loansLoading = useStore(state => state.loansLoading);
+  const getAvailableLoans = useStore(state => state.getAvailableLoans);
+  useEffect(() => {
+    console.log('loans', loans);
+  }, [loans]);
   return (
     <main>
+      {loansError && <p>{loansError.message}</p>}
+      {loansLoading && <p>loading...</p>}
       <h1>User status</h1>
       {user ? (
         <>
@@ -22,15 +29,14 @@ export default function UserStatusPage({
             <dd>{user.credits}</dd>
           </dl>
           <Button handleClick={getAvailableLoans}>Show available loans</Button>
-          {loans &&
-            loans.map(loan => (
-              <dl>
-                <dt>Amount:</dt>
-                <dd>{loan.amount}</dd>
-                <dt>Type:</dt>
-                <dd>{loan.type}</dd>
-              </dl>
-            ))}
+          {loans.map((loan, index) => (
+            <dl key={loan.id}>
+              <dt>Amount:</dt>
+              <dd>{loan.amount}</dd>
+              <dt>Type:</dt>
+              <dd>{loan.type}</dd>
+            </dl>
+          ))}
         </>
       ) : (
         <form onSubmit={handleSubmit}>
@@ -54,17 +60,5 @@ export default function UserStatusPage({
     const form = event.target;
     const input = form.elements.username;
     onLogin(input.value);
-  }
-
-  async function getAvailableLoans() {
-    try {
-      const response = await fetch(
-        'https://api.spacetraders.io/my/account?token=' + token
-      );
-      const data = await response.json();
-      setAvailableLoans(data.loans);
-    } catch (error) {
-      console.error('ERROR:', error);
-    }
   }
 }
