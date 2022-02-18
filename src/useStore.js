@@ -2,14 +2,21 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
 
-//  const [user, setUser] = useState(null);
+const fetchable = {
+  loading: false,
+  data: null,
+  error: null,
+};
+const initializeFetchable = () => ({
+  ...fetchable,
+});
 
 const useStore = create(
   persist(
     (set, get) => {
       return {
-        user: null,
-        token: null,
+        user: initializeFetchable(),
+        token: initializeFetchable(),
         isUserNameTaken: false,
         getUserInfo: async () => {
           const token = get().token;
