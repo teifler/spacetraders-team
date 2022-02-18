@@ -2,12 +2,7 @@ import useStore from '../useStore.js';
 import Button from '../components/Button.js';
 import { useEffect } from 'react';
 
-export default function UserStatusPage({
-  onLogin,
-  user,
-  isUsernameTaken,
-  token,
-}) {
+export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
   const loans = useStore(state => state.loans);
   const loansError = useStore(state => state.loansError);
   const loansLoading = useStore(state => state.loansLoading);
@@ -29,7 +24,7 @@ export default function UserStatusPage({
             <dd>{user.credits}</dd>
           </dl>
           <Button handleClick={getAvailableLoans}>Show available loans</Button>
-          {loans.map((loan, index) => (
+          {loans.map(loan => (
             <dl key={loan.id}>
               <dt>Amount:</dt>
               <dd>{loan.amount}</dd>

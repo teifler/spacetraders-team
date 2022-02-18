@@ -3,15 +3,15 @@ import Navigation from './components/Navigation.js';
 import ShipsPage from './pages/ShipsPage.js';
 import UserStatusPage from './pages/UserStatusPage.js';
 import MarketPage from './pages/MarketPage.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useStore from './useStore.js';
 
 function App() {
   const user = useStore(state => state.user);
-  const setUser = useStore(state => state.setUser);
+  const loginUser = useStore(state => state.loginUser);
+  const getUserInfo = useStore(state => state.getUserInfo);
   const token = useStore(state => state.token);
-  const setToken = useStore(state => state.setToken);
-  const [isUsernameTaken, setIsUsernameTaken] = useState(false);
+  const isUsernameTaken = useStore(state => state.isUserNameTaken);
 
   useEffect(() => {
     if (token && !user) {
@@ -39,40 +39,6 @@ function App() {
       </Routes>
     </div>
   );
-
-  async function loginUser(username) {
-    setIsUsernameTaken(false);
-
-    const response = await fetch(
-      `https://api.spacetraders.io/users/${username}/claim`,
-      {
-        method: 'POST',
-      }
-    ).catch(error => {
-      console.log('ERROR', error.message);
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Test -- ', data);
-      setToken(data.token);
-      setUser(data.user);
-    } else {
-      setIsUsernameTaken(true);
-    }
-  }
-
-  async function getUserInfo(token) {
-    try {
-      const response = await fetch(
-        'https://api.spacetraders.io/my/account?token=' + token
-      );
-      const data = await response.json();
-      setUser(data.user);
-    } catch (error) {
-      console.error('ERROR:', error);
-    }
-  }
 }
 
 export default App;

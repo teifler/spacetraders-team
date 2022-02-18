@@ -10,19 +10,49 @@ const useStore = create(
       return {
         user: null,
         token: null,
-        setUser: user => {
-          set({
-            user,
+        isUserNameTaken: false,
+        getUserInfo: async () => {
+          const token = get().token;
+          try {
+            const response = await fetch(
+              'https://api.spacetraders.io/my/account?token=' + token
+            );
+            const data = await response.json();
+            set({
+              user: data.user,
+            });
+          } catch (error) {
+            console.error('ERROR:', error);
+          }
+        },
+        loginUser: async username => {
+          set({ isUserNameTaken: false });
+          const response = await fetch(
+            `https://api.spacetraders.io/users/${username}/claim`,
+            {
+              method: 'POST',
+            }
+          ).catch(error => {
+            console.log('ERROR', error.message);
           });
+
+          if (response.ok) {
+            const data = await response.json();
+            set({
+              user: data.user,
+            });
+            set({
+              token: data.token,
+            });
+          } else {
+            set({ isUserNameTaken: true });
+          }
         },
-        setToken: token => {
-          set({ token });
-        },
-        loans_: {
-          data: [],
-          error: null,
-          loading: false,
-        },
+        // loans_: {
+        //   data: [],
+        //   error: null,
+        //   loading: false,
+        // },
         loans: [],
         loansError: null,
         loansLoading: false,
