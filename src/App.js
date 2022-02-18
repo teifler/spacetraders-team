@@ -9,14 +9,11 @@ import useStore from './useStore.js';
 function App() {
   const user = useStore(state => state.user);
   const setUser = useStore(state => state.setUser);
-  //const token = useStore(state => state.token);
-  const [token, setToken] = useState(loadFromLocal('token'));
-  //const [user, setUser] = useState(null);
+  const token = useStore(state => state.token);
+  const setToken = useStore(state => state.setToken);
   const [isUsernameTaken, setIsUsernameTaken] = useState(false);
 
   useEffect(() => {
-    saveToLocal('token', token);
-
     if (token && !user) {
       getUserInfo(token);
     }
@@ -33,6 +30,7 @@ function App() {
               onLogin={loginUser}
               user={user}
               isUsernameTaken={isUsernameTaken}
+              token={token}
             />
           }
         />
@@ -58,9 +56,7 @@ function App() {
       const data = await response.json();
       console.log('Test -- ', data);
       setToken(data.token);
-      //useStore.setState({ user: data.user });
       setUser(data.user);
-      console.log(user);
     } else {
       setIsUsernameTaken(true);
     }
@@ -75,18 +71,6 @@ function App() {
       setUser(data.user);
     } catch (error) {
       console.error('ERROR:', error);
-    }
-  }
-
-  function saveToLocal(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
-  }
-
-  function loadFromLocal(key) {
-    try {
-      return JSON.parse(localStorage.getItem(key));
-    } catch (error) {
-      console.log(error);
     }
   }
 }
