@@ -2,22 +2,23 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
 
-const fetchable = {
-  loading: false,
-  data: null,
-  error: null,
-};
-const initializeFetchable = () => ({
-  ...fetchable,
-});
+// const fetchable = {
+//   loading: false,
+//   data: null,
+//   error: null,
+// };
+// const initializeFetchable = () => ({
+//   ...fetchable,
+// });
 
 const useStore = create(
   persist(
     (set, get) => {
       return {
-        user: initializeFetchable(),
-        token: initializeFetchable(),
-        age: 50,
+        user: null,
+        userError: false,
+        token: null,
+        tokenError: false,
         isUserNameTaken: false,
         getUserInfo: async () => {
           const token = get().token;
@@ -30,6 +31,7 @@ const useStore = create(
               user: data.user,
             });
           } catch (error) {
+            set({ userError: true });
             console.error('ERROR:', error);
           }
         },
@@ -42,6 +44,7 @@ const useStore = create(
             }
           ).catch(error => {
             console.log('ERROR', error.message);
+            set({ tokenError: true });
           });
 
           if (response.ok) {
@@ -56,14 +59,9 @@ const useStore = create(
             set({ isUserNameTaken: true });
           }
         },
-        // loans_: {
-        //   data: [],
-        //   error: null,
-        //   loading: false,
-        // },
         loans: [],
-        loansError: null,
-        loansLoading: false,
+        loansError: false,
+        //loansLoading: false,
         getAvailableLoans: async () => {
           set({ loansLoading: true });
           const token = get().token;
@@ -75,10 +73,10 @@ const useStore = create(
             console.log(data);
             set({
               loans: data.loans.map(loan => ({ ...loan, id: nanoid() })),
-              loansLoading: false,
+              //loansLoading: false,
             });
           } catch (error) {
-            set({ loansError: error, loansLoading: false });
+            set({ loansError: true });
             console.error('ERROR:', error);
           }
         },

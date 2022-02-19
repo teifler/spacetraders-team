@@ -1,19 +1,15 @@
 import useStore from '../useStore.js';
 import Button from '../components/Button.js';
-import { useEffect } from 'react';
 
 export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
   const loans = useStore(state => state.loans);
   const loansError = useStore(state => state.loansError);
-  const loansLoading = useStore(state => state.loansLoading);
+  const tokenError = useStore(state => state.tokenError);
+  // const loansLoading = useStore(state => state.loansLoading);
   const getAvailableLoans = useStore(state => state.getAvailableLoans);
-  useEffect(() => {
-    console.log('loans', loans);
-  }, [loans]);
+
   return (
     <main>
-      {loansError && <p>{loansError.message}</p>}
-      {loansLoading && <p>loading...</p>}
       <h2>User status</h2>
       {user ? (
         <>
@@ -24,10 +20,18 @@ export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
             <dd>{user.credits}</dd>
           </dl>
           <Button handleClick={getAvailableLoans}>Show available loans</Button>
+          {loansError && (
+            <p>Currently there are no loans available. You are too broke!</p>
+          )}
+          {/* {loansLoading && <p>loading...</p>} */}
           {loans.map(loan => (
             <dl key={loan.id}>
               <dt>Amount:</dt>
               <dd>{loan.amount}</dd>
+              <dt>Rate:</dt>
+              <dd>{loan.rate}%</dd>
+              <dt>Due date:</dt>
+              <dd>{loan.termInDays}</dd>
               <dt>Type:</dt>
               <dd>{loan.type}</dd>
             </dl>
@@ -43,7 +47,8 @@ export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
             type="text"
             placeholder="e.g. neuefische"
           />
-          {isUsernameTaken && <p>Username already taken!</p>}
+          {isUsernameTaken && <p>Username is already taken! Get creative!</p>}
+          {tokenError && <p>Server is currently not working. Get a life!.</p>}
           <button>Login</button>
         </form>
       )}

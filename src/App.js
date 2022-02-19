@@ -9,6 +9,7 @@ import MarketPage from './pages/MarketPage.js';
 
 function App() {
   const user = useStore(state => state.user);
+  const userError = useStore(state => state.userError);
   const loginUser = useStore(state => state.loginUser);
   const getUserInfo = useStore(state => state.getUserInfo);
   const token = useStore(state => state.token);
@@ -24,8 +25,14 @@ function App() {
     <AppGrid>
       <Header>
         <h1>Spacetraders</h1>
-        <User>User: </User>
-        <Credit>Credits: </Credit>
+        {userError ? (
+          <p>Server currently not available!</p>
+        ) : (
+          <>
+            <User>User: </User>
+            <Credit>Credits: </Credit>
+          </>
+        )}
       </Header>
       <Routes>
         <Route
