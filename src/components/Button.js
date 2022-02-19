@@ -1,3 +1,7 @@
-export default function Button({ handleClick, children }) {
-  return <button onClick={handleClick}>{children}</button>;
+export default function Button({ handleClick, children, disabled }) {
+  return (
+    <button onClick={handleClick} disabled={disabled}>
+      {children}
+    </button>
+  );
 }

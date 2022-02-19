@@ -1,6 +1,7 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
+import produce from 'immer';
 
 // const fetchable = {
 //   loading: false,
@@ -63,18 +64,40 @@ const useStore = create(
         loansError: false,
         //loansLoading: false,
         getAvailableLoans: async () => {
-          set({ loansLoading: true });
           const token = get().token;
           try {
             const response = await fetch(
               'https://api.spacetraders.io/types/loans?token=' + token
             );
             const data = await response.json();
-            console.log(data);
             set({
               loans: data.loans.map(loan => ({ ...loan, id: nanoid() })),
               //loansLoading: false,
             });
+          } catch (error) {
+            set({ availableLoansError: true });
+            console.error('ERROR:', error);
+          }
+        },
+        takeOutLoan: async () => {
+          const token = get().token;
+          const type = get().loans[0].type;
+          const user = get().user;
+          try {
+            const response = await fetch(
+              `https://api.spacetraders.io/my/loans?token=${token}&type=${type}`,
+              {
+                method: 'POST',
+              }
+            );
+            const data = await response.json();
+            console.log(data);
+            set(
+              produce(state => {
+                state.user.loans = [...user.loans, data.loan];
+                state.user.credits = data.credits;
+              })
+            );
           } catch (error) {
             set({ loansError: true });
             console.error('ERROR:', error);

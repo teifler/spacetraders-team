@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import useStore from './useStore.js';
+import Header from './components/Header.js';
 import Navigation from './components/Navigation.js';
 import ShipsPage from './pages/ShipsPage.js';
 import UserStatusPage from './pages/UserStatusPage.js';
@@ -23,17 +24,7 @@ function App() {
 
   return (
     <AppGrid>
-      <Header>
-        <h1>Spacetraders</h1>
-        {userError ? (
-          <p>Server currently not available!</p>
-        ) : (
-          <>
-            <User>User: </User>
-            <Credit>Credits: </Credit>
-          </>
-        )}
-      </Header>
+      <Header user={user} userError={userError} />
       <Routes>
         <Route
           path="/"
@@ -60,31 +51,4 @@ const AppGrid = styled.div`
   height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr 48px;
-`;
-
-const Header = styled.header`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  background-color: lightgrey;
-
-  background-color: #65737e;
-  & h1 {
-    justify-self: center;
-    align-self: center;
-    grid-area: 1 / 1 / 2 / 4;
-    font-size: 1.8rem;
-    font-family: 'spaceAge', 'sans-serif';
-  }
-`;
-
-const User = styled.p`
-  grid-area: 2 / 2 / 3 /3;
-
-  align-self: end;
-`;
-
-const Credit = styled.p`
-  grid-area: 2 / 3 / 3 / 4;
-  align-self: end;
 `;

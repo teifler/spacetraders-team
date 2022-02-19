@@ -7,6 +7,7 @@ export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
   const tokenError = useStore(state => state.tokenError);
   // const loansLoading = useStore(state => state.loansLoading);
   const getAvailableLoans = useStore(state => state.getAvailableLoans);
+  const takeOutLoan = useStore(state => state.takeOutLoan);
 
   return (
     <main>
@@ -14,10 +15,10 @@ export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
       {user ? (
         <>
           <dl>
-            <dt>Username:</dt>
-            <dd>{user.username}</dd>
             <dt>Credits:</dt>
             <dd>{user.credits}</dd>
+            <dt>Ships:</dt>
+            <dd>{user.shipCount}</dd>
           </dl>
           <Button handleClick={getAvailableLoans}>Show available loans</Button>
           {loansError && (
@@ -25,16 +26,36 @@ export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
           )}
           {/* {loansLoading && <p>loading...</p>} */}
           {loans.map(loan => (
-            <dl key={loan.id}>
-              <dt>Amount:</dt>
-              <dd>{loan.amount}</dd>
-              <dt>Rate:</dt>
-              <dd>{loan.rate}%</dd>
-              <dt>Due date:</dt>
-              <dd>{loan.termInDays}</dd>
-              <dt>Type:</dt>
-              <dd>{loan.type}</dd>
-            </dl>
+            <>
+              <dl key={loan.id}>
+                <dt>Amount:</dt>
+                <dd>{loan.amount}</dd>
+                <dt>Rate:</dt>
+                <dd>{loan.rate}%</dd>
+                <dt>Due date:</dt>
+                <dd>{loan.termInDays}</dd>
+                <dt>Type:</dt>
+                <dd>{loan.type}</dd>
+              </dl>
+              <Button
+                handleClick={takeOutLoan}
+                disabled={user.loans.length > 0 ? true : false}
+              >
+                Take out a loan
+              </Button>
+              {user.loans.map(loan => (
+                <dl key={loan.id}>
+                  <dt>Due date:</dt>
+                  <dd>{loan.due}</dd>
+                  <dt>Status:</dt>
+                  <dd>{loan.status}</dd>
+                  <dt>Repayment amount:</dt>
+                  <dd>{loan.repaymentAmount}</dd>
+                  <dt>Type:</dt>
+                  <dd>{loan.type}</dd>
+                </dl>
+              ))}
+            </>
           ))}
         </>
       ) : (
