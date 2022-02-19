@@ -3,22 +3,28 @@ import { NavLink } from 'react-router-dom';
 
 export default function Navigation() {
   return (
-    <nav>
-      <LinkButton to="/">User status</LinkButton>
-      <LinkButton to="/ships">Available ships</LinkButton>
-      <LinkButton to="/market">Marketplace</LinkButton>
-    </nav>
+    <Wrapper>
+      <LinkButton to="/">User</LinkButton>
+      <LinkButton to="/ships">Ships</LinkButton>
+      <LinkButton to="/market">Market</LinkButton>
+    </Wrapper>
   );
 }
 
+const Wrapper = styled.nav`
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(3, 1fr);
+`;
+
 const LinkButton = styled(NavLink)`
-  padding: 4px 12px;
-  border: 1px solid #bbb;
-  border-radius: 4px;
-  background-color: #eee;
+  padding: 15px 15px;
+  font-weight: 600;
+  background-color: #65737e;
   text-decoration: none;
+  text-align: center;
   color: #333;
   &.active {
-    background-color: hotpink;
+    background-color: #c0c5ce;
   }
 `;

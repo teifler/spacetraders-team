@@ -1,14 +1,35 @@
 import { createGlobalStyle } from 'styled-components';
+import spaceAge from './fonts/space_age-webfont.woff2';
+import spaceAge1 from './fonts/space_age-webfont.woff';
 
 export default createGlobalStyle`
+@font-face {
+   font-family: spaceAge;
+    font-style: normal;
+    font-weight: normal;
+    src: url(${spaceAge}), url(${spaceAge1});;
+
+}
+
+
+
  * {
     box-sizing: border-box;
+    padding: 0;
+    margin:0;
+    line-height: 1.5;
  }
+
+ 
 
  body {
-    font-family: sans-serif;
+   font-family: sans-serif;
+   background-color: #343d46;
+   color: #F3F8FF;
  }
-
+ main {
+    padding: 20px
+ }
  .sr-only{
     position: absolute;
     width: 1px;

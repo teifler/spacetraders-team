@@ -14,7 +14,7 @@ export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
     <main>
       {loansError && <p>{loansError.message}</p>}
       {loansLoading && <p>loading...</p>}
-      <h1>User status</h1>
+      <h2>User status</h2>
       {user ? (
         <>
           <dl>

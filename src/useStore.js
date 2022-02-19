@@ -17,6 +17,7 @@ const useStore = create(
       return {
         user: initializeFetchable(),
         token: initializeFetchable(),
+        age: 50,
         isUserNameTaken: false,
         getUserInfo: async () => {
           const token = get().token;
