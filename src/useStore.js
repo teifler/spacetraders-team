@@ -2,27 +2,64 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
 
-//  const [user, setUser] = useState(null);
+const fetchable = {
+  loading: false,
+  data: null,
+  error: null,
+};
+const initializeFetchable = () => ({
+  ...fetchable,
+});
 
 const useStore = create(
   persist(
     (set, get) => {
       return {
-        user: null,
-        token: null,
-        setUser: user => {
-          set({
-            user,
+        user: initializeFetchable(),
+        token: initializeFetchable(),
+        isUserNameTaken: false,
+        getUserInfo: async () => {
+          const token = get().token;
+          try {
+            const response = await fetch(
+              'https://api.spacetraders.io/my/account?token=' + token
+            );
+            const data = await response.json();
+            set({
+              user: data.user,
+            });
+          } catch (error) {
+            console.error('ERROR:', error);
+          }
+        },
+        loginUser: async username => {
+          set({ isUserNameTaken: false });
+          const response = await fetch(
+            `https://api.spacetraders.io/users/${username}/claim`,
+            {
+              method: 'POST',
+            }
+          ).catch(error => {
+            console.log('ERROR', error.message);
           });
+
+          if (response.ok) {
+            const data = await response.json();
+            set({
+              user: data.user,
+            });
+            set({
+              token: data.token,
+            });
+          } else {
+            set({ isUserNameTaken: true });
+          }
         },
-        setToken: token => {
-          set({ token });
-        },
-        loans_: {
-          data: [],
-          error: null,
-          loading: false,
-        },
+        // loans_: {
+        //   data: [],
+        //   error: null,
+        //   loading: false,
+        // },
         loans: [],
         loansError: null,
         loansLoading: false,
