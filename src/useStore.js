@@ -108,6 +108,7 @@ const useStore = create(
               }
             );
             const data = await response.json();
+            console.log(type);
             set(
               produce(state => {
                 state.user.data.loans = [...user.data.loans, data.loan];
