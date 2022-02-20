@@ -18,7 +18,7 @@ const useStore = create(
         user: initializeFetchable(),
         token: initializeFetchable(),
         isUserNameTaken: false,
-        availableLoans: { data: [], error: null },
+        availableLoans: initializeFetchable(),
         getUserInfo: async () => {
           const token = get().token;
           try {
@@ -81,10 +81,12 @@ const useStore = create(
             const data = await response.json();
             set(
               produce(state => {
-                state.availableLoans.data = data.loans;
+                state.availableLoans.data = data.loans.map(loan => ({
+                  ...loan,
+                  id: nanoid(),
+                }));
               })
             );
-            console.log(data.loans);
           } catch (error) {
             set(
               produce(state => {
