@@ -18,7 +18,7 @@ const useStore = create(
         user: initializeFetchable(),
         token: initializeFetchable(),
         isUserNameTaken: false,
-        availableLoans: { data: [], error: null },
+        availableLoans: initializeFetchable(),
         getUserInfo: async () => {
           const token = get().token;
           try {
@@ -79,12 +79,14 @@ const useStore = create(
               'https://api.spacetraders.io/types/loans?token=' + token
             );
             const data = await response.json();
-            // set(
-            //   produce(state => {
-            //     state.availableLoans.data = data.loans;
-            //   })
-            // );
-            console.log(data.loans);
+            set(
+              produce(state => {
+                state.availableLoans.data = data.loans.map(loan => ({
+                  ...loan,
+                  id: nanoid(),
+                }));
+              })
+            );
           } catch (error) {
             set(
               produce(state => {
@@ -96,7 +98,7 @@ const useStore = create(
         },
         takeOutLoan: async () => {
           const token = get().token.data;
-          const type = get().availableLoans[0].type;
+          const type = get().availableLoans.data[0].type;
           const user = get().user;
           try {
             const response = await fetch(

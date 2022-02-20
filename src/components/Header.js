@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export default function Header({ user, userError }) {
+export default function Header({ user }) {
   return (
     <Wrapper>
       <h1>Spacetraders</h1>
