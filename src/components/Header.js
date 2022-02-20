@@ -4,12 +4,12 @@ export default function Header({ user, userError }) {
   return (
     <Wrapper>
       <h1>Spacetraders</h1>
-      {userError ? (
+      {user.error ? (
         <p>Server currently not available!</p>
-      ) : user ? (
+      ) : user.data ? (
         <>
-          <User>{user.username} </User>
-          <Credit>{user.credits} Credits </Credit>
+          <User>{user.data.username} </User>
+          <Credit>{user.data.credits} Credits </Credit>
         </>
       ) : (
         ''

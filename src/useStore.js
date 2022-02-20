@@ -3,24 +3,22 @@ import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
 import produce from 'immer';
 
-// const fetchable = {
-//   loading: false,
-//   data: null,
-//   error: null,
-// };
-// const initializeFetchable = () => ({
-//   ...fetchable,
-// });
+const fetchable = {
+  data: null,
+  error: null,
+};
+const initializeFetchable = () => ({
+  ...fetchable,
+});
 
 const useStore = create(
   persist(
     (set, get) => {
       return {
-        user: null,
-        userError: false,
-        token: null,
-        tokenError: false,
+        user: initializeFetchable(),
+        token: initializeFetchable(),
         isUserNameTaken: false,
+        availableLoans: { data: [], error: null },
         getUserInfo: async () => {
           const token = get().token;
           try {
@@ -28,11 +26,17 @@ const useStore = create(
               'https://api.spacetraders.io/my/account?token=' + token
             );
             const data = await response.json();
-            set({
-              user: data.user,
-            });
+            set(
+              produce(state => {
+                state.user.data = data.user;
+              })
+            );
           } catch (error) {
-            set({ userError: true });
+            set(
+              produce(state => {
+                state.user.error = true;
+              })
+            );
             console.error('ERROR:', error);
           }
         },
@@ -45,43 +49,54 @@ const useStore = create(
             }
           ).catch(error => {
             console.log('ERROR', error.message);
-            set({ tokenError: true });
+            set(
+              produce(state => {
+                state.token.error = true;
+              })
+            );
           });
 
           if (response.ok) {
             const data = await response.json();
-            set({
-              user: data.user,
-            });
-            set({
-              token: data.token,
-            });
+            set(
+              produce(state => {
+                state.user.data = data.user;
+              })
+            );
+            set(
+              produce(state => {
+                state.token.data = data.token;
+              })
+            );
           } else {
             set({ isUserNameTaken: true });
           }
         },
-        loans: [],
-        loansError: false,
-        //loansLoading: false,
         getAvailableLoans: async () => {
-          const token = get().token;
+          const token = get().token.data;
           try {
             const response = await fetch(
               'https://api.spacetraders.io/types/loans?token=' + token
             );
             const data = await response.json();
-            set({
-              loans: data.loans.map(loan => ({ ...loan, id: nanoid() })),
-              //loansLoading: false,
-            });
+            // set(
+            //   produce(state => {
+            //     state.availableLoans.data = data.loans;
+            //   })
+            // );
+            console.log(data.loans);
           } catch (error) {
-            set({ availableLoansError: true });
+            set(
+              produce(state => {
+                state.availableLoans.error = true;
+              })
+            );
             console.error('ERROR:', error);
           }
         },
         takeOutLoan: async () => {
-          const token = get().token;
-          const type = get().loans[0].type;
+          const token = get().token.data;
+          const type = get().availableLoans[0].type;
           const user = get().user;
           try {
             const response = await fetch(
@@ -91,11 +106,10 @@ const useStore = create(
               }
             );
             const data = await response.json();
-            console.log(data);
             set(
               produce(state => {
-                state.user.loans = [...user.loans, data.loan];
-                state.user.credits = data.credits;
+                state.user.data.loans = [...user.data.loans, data.loan];
+                state.user.data.credits = data.credits;
               })
             );
           } catch (error) {
