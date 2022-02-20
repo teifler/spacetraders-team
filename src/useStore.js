@@ -1,9 +1,9 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
+import produce from 'immer';
 
 const fetchable = {
-  loading: false,
   data: null,
   error: null,
 };
@@ -17,8 +17,8 @@ const useStore = create(
       return {
         user: initializeFetchable(),
         token: initializeFetchable(),
-        age: 50,
         isUserNameTaken: false,
+        availableLoans: { data: [], error: null },
         getUserInfo: async () => {
           const token = get().token;
           try {
@@ -26,10 +26,17 @@ const useStore = create(
               'https://api.spacetraders.io/my/account?token=' + token
             );
             const data = await response.json();
-            set({
-              user: data.user,
-            });
+            set(
+              produce(state => {
+                state.user.data = data.user;
+              })
+            );
           } catch (error) {
+            set(
+              produce(state => {
+                state.user.error = true;
+              })
+            );
             console.error('ERROR:', error);
           }
         },
@@ -42,43 +49,72 @@ const useStore = create(
             }
           ).catch(error => {
             console.log('ERROR', error.message);
+            set(
+              produce(state => {
+                state.token.error = true;
+              })
+            );
           });
 
           if (response.ok) {
             const data = await response.json();
-            set({
-              user: data.user,
-            });
-            set({
-              token: data.token,
-            });
+            set(
+              produce(state => {
+                state.user.data = data.user;
+              })
+            );
+            set(
+              produce(state => {
+                state.token.data = data.token;
+              })
+            );
           } else {
             set({ isUserNameTaken: true });
           }
         },
-        // loans_: {
-        //   data: [],
-        //   error: null,
-        //   loading: false,
-        // },
-        loans: [],
-        loansError: null,
-        loansLoading: false,
         getAvailableLoans: async () => {
-          set({ loansLoading: true });
-          const token = get().token;
+          const token = get().token.data;
           try {
             const response = await fetch(
               'https://api.spacetraders.io/types/loans?token=' + token
             );
             const data = await response.json();
-            console.log(data);
-            set({
-              loans: data.loans.map(loan => ({ ...loan, id: nanoid() })),
-              loansLoading: false,
-            });
+            set(
+              produce(state => {
+                state.availableLoans.data = data.loans;
+              })
+            );
+            console.log(data.loans);
           } catch (error) {
-            set({ loansError: error, loansLoading: false });
+            set(
+              produce(state => {
+                state.availableLoans.error = true;
+              })
+            );
+            console.error('ERROR:', error);
+          }
+        },
+        takeOutLoan: async () => {
+          const token = get().token.data;
+          const type = get().availableLoans.data[0].type;
+          const user = get().user;
+          try {
+            const response = await fetch(
+              `https://api.spacetraders.io/my/loans?token=${token}&type=${type}`,
+              {
+                method: 'POST',
+              }
+            );
+            const data = await response.json();
+            console.log(type);
+            set(
+              produce(state => {
+                state.user.data.loans = [...user.data.loans, data.loan];
+                state.user.data.credits = data.credits;
+              })
+            );
+          } catch (error) {
+            set({ loansError: true });
             console.error('ERROR:', error);
           }
         },
