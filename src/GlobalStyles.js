@@ -20,11 +20,11 @@ export default createGlobalStyle`
 
  body {
    font-family: sans-serif;
-   background-color: #343d46;
+   background-color: #121212;
    color: #F3F8FF;
  }
  main {
-    padding: 20px
+    padding: 15px 20px;
  }
  .sr-only{
     position: absolute;

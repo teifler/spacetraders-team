@@ -18,10 +18,12 @@ const Template = args => <Header {...args} />;
 
 export const HeaderDefault = Template.bind({});
 HeaderDefault.args = {
-  user: { data: { username: 'Andrea', credits: 0 }, error: false },
+  user: { data: { username: 'Astronaut', credits: 10000 } },
+  error: false,
 };
 
 export const HeaderWithError = Template.bind({});
 HeaderWithError.args = {
-  user: { data: { username: 'Andrea', credits: 0 }, error: true },
+  user: { data: { username: 'Astronaut', credits: 10000 } },
+  error: true,
 };
