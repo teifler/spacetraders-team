@@ -17,6 +17,7 @@ function App() {
     if (token && !user) {
       getUserInfo(token);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, token]);
 
   return (
