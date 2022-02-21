@@ -1,87 +1,118 @@
 import useStore from '../useStore.js';
+import styled from 'styled-components';
 import Button from '../components/Button.js';
+import LoginPage from '../components/LoginPage.js';
 
-export default function UserStatusPage({ onLogin, user, isUsernameTaken }) {
+export default function UserStatusPage({ user, token }) {
   const availableLoans = useStore(state => state.availableLoans);
-  const token = useStore(state => state.token);
-  // const loansLoading = useStore(state => state.loansLoading);
   const getAvailableLoans = useStore(state => state.getAvailableLoans);
   const takeOutLoan = useStore(state => state.takeOutLoan);
 
   return (
     <main>
-      <h2>User status</h2>
       {user.data ? (
-        <>
-          <dl>
-            <dt>Credits:</dt>
-            <dd>{user.data.credits}</dd>
-            <dt>Ships:</dt>
-            <dd>{user.data.shipCount}</dd>
-          </dl>
-          <Button handleClick={getAvailableLoans}>Show available loans</Button>
-          {availableLoans.error && (
-            <p>Currently there are no loans available. You are too broke!</p>
-          )}
-          {availableLoans.data !== null
-            ? availableLoans.data.map(loan => (
-                <>
-                  <dl key={loan.id}>
-                    <dt>Amount:</dt>
-                    <dd>{loan.amount}</dd>
-                    <dt>Rate:</dt>
-                    <dd>{loan.rate}%</dd>
-                    <dt>Due date:</dt>
-                    <dd>{loan.termInDays}</dd>
-                    <dt>Type:</dt>
-                    <dd>{loan.type}</dd>
-                  </dl>
+        <PageGrid>
+          <section>
+            <Heading>Dashboard</Heading>
+            <UserInfo>
+              <p>Credits: {user.data.credits}</p>
+              <p>Ships: {user.data.ships.length}</p>
+            </UserInfo>
+          </section>
+          <Wrapper>
+            <Heading>Your Loans</Heading>
+            {user.data.loans.length !== 0 ? (
+              user.data.loans.map(loan => (
+                <LoanContainer key={loan.id}>
+                  <Header>
+                    <span>{loan.type}</span>
+                    <span>{loan.status}</span>
+                  </Header>
+                  <p>
+                    {loan.repaymentAmount} Credits due {loan.due}
+                  </p>
+                </LoanContainer>
+              ))
+            ) : (
+              <p>You are completley broke. Get a loan!</p>
+            )}
+          </Wrapper>
+          <Wrapper>
+            <Heading>Available Loans</Heading>
+            {availableLoans.error && (
+              <p>Currently there are no loans available. You are too broke!</p>
+            )}
+            {availableLoans.data !== null ? (
+              availableLoans.data.map(loan => (
+                <LoanContainer key={loan.id}>
+                  <Header>
+                    <span>{loan.type}</span>
+                    <span>{loan.termInDays} days</span>
+                  </Header>
+                  <p>
+                    {loan.amount} Credits at {loan.rate}%
+                  </p>
                   <Button
                     handleClick={takeOutLoan}
                     disabled={user.data.loans.length > 0 ? true : false}
                   >
-                    Take out a loan
+                    ACCEPT LOAN
                   </Button>
-                </>
+                </LoanContainer>
               ))
-            : ''}
-          {user.data.loans !== null
-            ? user.data.loans.map(loan => (
-                <dl key={loan.id}>
-                  <dt>Due date:</dt>
-                  <dd>{loan.due}</dd>
-                  <dt>Status:</dt>
-                  <dd>{loan.status}</dd>
-                  <dt>Repayment amount:</dt>
-                  <dd>{loan.repaymentAmount}</dd>
-                  <dt>Type:</dt>
-                  <dd>{loan.type}</dd>
-                </dl>
-              ))
-            : ''}
-        </>
+            ) : (
+              <Button handleClick={getAvailableLoans}>
+                SHOW AVAILABLE LOANS
+              </Button>
+            )}{' '}
+          </Wrapper>
+        </PageGrid>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="username">Please select a user name</label>
-          <input
-            required
-            id="username"
-            name="username"
-            type="text"
-            placeholder="e.g. neuefische"
-          />
-          {isUsernameTaken && <p>Username is already taken! Get creative!</p>}
-          {token.error && <p>Server is currently not working. Get a life!.</p>}
-          <button>Login</button>
-        </form>
+        <LoginPage token={token} />
       )}
     </main>
   );
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const input = form.elements.username;
-    onLogin(input.value);
-  }
 }
+
+const PageGrid = styled.div`
+  display: grid;
+  gap: 20px;
+`;
+
+const Wrapper = styled.section`
+  display: grid;
+  gap: 5px;
+
+  & p {
+    padding: 10px 0 0 12px;
+  }
+`;
+
+const Heading = styled.h2`
+  font-size: 1.4rem;
+  font-weight: 500;
+  padding: 5px 10px;
+`;
+
+const UserInfo = styled.div`
+  padding: 10px 15px;
+  background-color: #1c1c1c;
+  border-radius: 6px;
+`;
+
+const LoanContainer = styled.div`
+  display: grid;
+  gap: 5px;
+  padding: 10px 15px;
+  background-color: #1c1c1c;
+  border-radius: 6px;
+  font-size: 1.1rem;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #9ba5b0;
+  padding-bottom: 10px;
+`;
